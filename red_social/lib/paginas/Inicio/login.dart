@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'Index.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(Login());
 }
 
-class MainApp extends StatelessWidget {
+class login extends StatelessWidget {
+  const login({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,22 +20,24 @@ class MainApp extends StatelessWidget {
 
 
 class Login extends StatelessWidget {
+  const Login({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black87,
       appBar: AppBar(
-        title: Text("Login"),
+        title: const Text("Login"),
         backgroundColor: Colors.black87,
         elevation: 0,
       ),
       body: Padding(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
+            const Text(
               "Login",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -42,7 +46,7 @@ class Login extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             TextField(
               decoration: InputDecoration(
                 labelText: "Inserta el correo",
@@ -53,7 +57,7 @@ class Login extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               obscureText: true,
               decoration: InputDecoration(
@@ -65,7 +69,7 @@ class Login extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
@@ -74,9 +78,9 @@ class Login extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 15),
+                padding: const EdgeInsets.symmetric(vertical: 15),
               ),
-              child: Text(
+              child: const Text(
                 "Acceder",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),

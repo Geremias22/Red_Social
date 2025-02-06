@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'index.dart'; 
+import 'package:red_social/paginas/Inicio/Index.dart';
+
 
 void main() {
   runApp(const MainApp()); 
@@ -11,9 +12,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Index(), // Usamos Index como la pantalla principal
+        debugShowCheckedModeBanner: false,
+      home: Index() // Usamos Index como la pantalla principal
     );
   }
 }
 
-}
