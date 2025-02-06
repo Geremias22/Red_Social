@@ -51,7 +51,7 @@ class InputText extends StatelessWidget {
                   filled: true,
                   hintText: textHint,
                   hintStyle: TextStyle(
-                    color: invert ?  const Color.fromARGB(255, 61, 59, 57) : Colors.white,
+                    color: invert ?  const Color.fromARGB(255, 153, 144, 133) : Colors.white,
                     fontStyle: FontStyle.italic,
                   ),
                   enabledBorder: OutlineInputBorder(
