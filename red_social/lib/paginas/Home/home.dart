@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'search.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,10 +9,21 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (index == 1) { // Si se toca "Buscar", cambiar a Search
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Search()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fondo blanco base
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Historias"),
         centerTitle: true,
@@ -30,17 +42,15 @@ class _HomeState extends State<Home> {
       ),
       body: Stack(
         children: [
-          // Fondo con líneas diagonales (simulación)
           Container(
             decoration: BoxDecoration(
               color: Colors.orange.shade100,
               image: const DecorationImage(
-                image: AssetImage('assets/diagonal_lines.png'), // Imagen con líneas diagonales
+                image: AssetImage('assets/diagonal_lines.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          // Caja blanca en el centro
           Center(
             child: Container(
               width: MediaQuery.of(context).size.width * 0.9,
@@ -60,15 +70,15 @@ class _HomeState extends State<Home> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
         ],
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
       ),
     );
   }

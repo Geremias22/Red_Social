@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -9,6 +10,7 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   List<String> searchHistory = [];
+  int _selectedIndex = 1;
 
   void addToHistory(String search) {
     setState(() {
@@ -25,6 +27,15 @@ class _SearchState extends State<Search> {
     setState(() {
       searchHistory.clear();
     });
+  }
+
+  void _onItemTapped(int index) {
+    if (index == 0) { // Volver a Home
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Home()),
+      );
+    }
   }
 
   @override
@@ -87,8 +98,10 @@ class _SearchState extends State<Search> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
