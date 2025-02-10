@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:red_social/componentes/botones.dart';
+import 'package:red_social/componentes/custom_appbar.dart';
 import 'package:red_social/componentes/input_text.dart';
 import 'package:red_social/paginas/Inicio/Index.dart';
 import 'package:red_social/paginas/Inicio/login.dart';
@@ -37,7 +38,8 @@ class _CrearCuentaState extends State<CrearCuenta> {
     }
 
     if (!validarCorreo(correo)) {
-      mostrarMensaje("Formato de correo inválido, debe se '@gmail.com' por ejemplo");
+      mostrarMensaje(
+          "Formato de correo inválido, debe se '@gmail.com' por ejemplo");
       return;
     }
 
@@ -79,14 +81,7 @@ class _CrearCuentaState extends State<CrearCuenta> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black87,
-      appBar: AppBar(
-        title: const Text(
-          "Crear Cuenta",
-          style: TextStyle(color: Colors.black87),
-        ),
-        backgroundColor: const Color.fromARGB(167, 251, 251, 251),
-        elevation: 0,
-      ),
+      appBar: const CustomAppBar(title: "Crear Cuenta"),
       body: Padding(
         padding: const EdgeInsets.only(top: 0, left: 50, right: 50),
         child: SingleChildScrollView(
@@ -139,7 +134,8 @@ class _CrearCuentaState extends State<CrearCuenta> {
                 children: [
                   Botones(
                     textBoton: "Crear Cuenta",
-                    accionBoton: validarYCrearCuenta, // Validación antes de crear
+                    accionBoton:
+                        validarYCrearCuenta, // Validación antes de crear
                   ),
                   const SizedBox(height: 15),
                   Botones(

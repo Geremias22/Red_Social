@@ -4,7 +4,7 @@ class InputText extends StatelessWidget {
   final String textEtiqueta;
   final String? textHint;
   final TextEditingController tecInput;
-  final bool invert;
+  final bool? invert;
   final bool? passwd;
 
   const InputText({
@@ -12,7 +12,7 @@ class InputText extends StatelessWidget {
     required this.textEtiqueta,
     this.textHint,
     required this.tecInput,
-    required this.invert, 
+    this.invert, 
     this.passwd,
   });
 

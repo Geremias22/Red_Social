@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/componentes/botones.dart';
+import 'package:red_social/componentes/custom_appbar.dart';
+import 'package:red_social/componentes/input_text.dart';
 import 'Index.dart';
 
 void main() {
@@ -24,13 +27,10 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController tecCorreo = TextEditingController();
     return Scaffold(
       backgroundColor: Colors.black87,
-      appBar: AppBar(
-        title: const Text("Login"),
-        backgroundColor: Colors.black87,
-        elevation: 0,
-      ),
+      appBar: const CustomAppBar(title: "Login"),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -47,44 +47,15 @@ class Login extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-            TextField(
-              decoration: InputDecoration(
-                labelText: "Inserta el correo",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
+           
+            InputText(textEtiqueta: "Inserta el correo", tecInput: tecCorreo, textHint: "Escribe el correo...",),
+
             const SizedBox(height: 20),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: "Inserta la contraseña",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
+
+            InputText(textEtiqueta: "Inserta la contraseña", tecInput: tecCorreo, textHint: "Escribe la contraseña...",),
+
             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 15),
-              ),
-              child: const Text(
-                "Acceder",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
+            Botones(textBoton: "Aceptar", accionBoton: (){})
           ],
         ),
       ),

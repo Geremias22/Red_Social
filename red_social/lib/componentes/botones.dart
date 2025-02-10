@@ -37,13 +37,15 @@ class _BotonesState extends State<Botones> {
             ],
           ),
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-          child: Text(
-            widget.textBoton,
-            style: TextStyle(
-              color: Colors.black87, // Texto oscuro para contrastar con el botón blanco
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
+          child: Center(
+            child: Text(
+              widget.textBoton,
+              style: TextStyle(
+                color: Colors.black87, // Texto oscuro para contrastar con el botón blanco
+                fontSize: isHovering ? 18 : 18,
+                fontWeight: isHovering ? FontWeight.w900 : FontWeight.w500,
+                letterSpacing: 1.5,
+              ),
             ),
           ),
         ),
