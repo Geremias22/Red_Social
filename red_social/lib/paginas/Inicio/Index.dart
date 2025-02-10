@@ -3,7 +3,7 @@ import 'package:red_social/paginas/Inicio/Crear_Cuenta.dart';
 import 'package:red_social/paginas/Inicio/login.dart';
 
 void main() {
-  runApp(Index());
+  runApp(const Index());
 }
 
 class Index extends StatelessWidget {
@@ -11,7 +11,7 @@ class Index extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LoginScreen(),
     );
@@ -33,7 +33,7 @@ class LoginScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CrearCuenta()),
+                  MaterialPageRoute(builder: (context) => const CrearCuenta()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -54,7 +54,7 @@ class LoginScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => const Login()),
                 );
               },
               style: ElevatedButton.styleFrom(
