@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'Index.dart';
 
 void main() {
-  runApp(Login());
+  runApp(const Login());
 }
 
 class login extends StatelessWidget {
@@ -10,7 +10,7 @@ class login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Index(),
     );
