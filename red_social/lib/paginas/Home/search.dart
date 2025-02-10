@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/paginas/Configuracion/bottom_nav.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -86,15 +87,7 @@ class _SearchState extends State<Search> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-        ],
-      ),
+      bottomNavigationBar: const BottomNav(currentIndex: 1),
     );
   }
 }

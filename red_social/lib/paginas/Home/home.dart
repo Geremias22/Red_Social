@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/paginas/Configuracion/bottom_nav.dart';
+import 'package:red_social/paginas/Home/Chat/bandeja_entrada.dart';
+import 'package:red_social/paginas/Home/cam.dart'; // Importamos el BottomNav
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,6 +11,17 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int _currentIndex = 0; // Controla la pestaña actual
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    // Aquí puedes manejar la navegación entre pantallas
+   
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,12 +33,22 @@ class _HomeState extends State<Home> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.camera_alt, color: Colors.red),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Cam()),
+            );
+          },
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.message, color: Colors.green),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BandejaEntrada()),
+              );
+            },
           ),
         ],
       ),
@@ -59,17 +83,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-        ],
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-      ),
+      bottomNavigationBar: const BottomNav(currentIndex: 0),
     );
   }
 }
