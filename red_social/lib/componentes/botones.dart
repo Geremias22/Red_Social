@@ -11,7 +11,7 @@ class Botones extends StatefulWidget {
 }
 
 class _BotonesState extends State<Botones> {
-  bool isHovering = false; // Para detectar si el mouse está encima
+  bool isHovering = false; // Para detectar el hover
 
   @override
   Widget build(BuildContext context) {
@@ -20,30 +20,30 @@ class _BotonesState extends State<Botones> {
       onExit: (_) => setState(() => isHovering = false), // Desactiva hover
       child: InkWell(
         onTap: widget.accionBoton,
-        borderRadius: BorderRadius.circular(20), // Hace la animación más fluida
+        borderRadius: BorderRadius.circular(20),
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 200), // Animación suave
+          duration: const Duration(milliseconds: 200), // Animación suave
           decoration: BoxDecoration(
-            color: isHovering ? const Color.fromARGB(255, 255, 140, 0) : Color.fromARGB(255, 253, 147, 17), // Cambio de color
+            color: isHovering ? Colors.grey[300] : Colors.white, // Cambio de color al hacer hover
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white, width: 3), // Borde más visible
+            border: Border.all(color: Colors.white, width: 2), // Borde blanco
             boxShadow: [
               BoxShadow(
-                color: isHovering ? Color.fromARGB(255, 255, 174, 74) : const Color.fromARGB(2255, 253, 147, 17), // Sombra dinámica
-                blurRadius: isHovering ? 15 : 8,
-                spreadRadius: isHovering ? 5 : 2,
-                offset: Offset(0, 5),
+                color: isHovering ? Colors.white54 : Colors.grey[600]!, // Sombra dinámica
+                blurRadius: isHovering ? 12 : 6,
+                spreadRadius: isHovering ? 3 : 1,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 25),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
           child: Text(
             widget.textBoton,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
+            style: TextStyle(
+              color: Colors.black87, // Texto oscuro para contrastar con el botón blanco
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              letterSpacing: 3,
+              letterSpacing: 1.5,
             ),
           ),
         ),

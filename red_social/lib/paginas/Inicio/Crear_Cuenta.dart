@@ -5,7 +5,6 @@ import 'package:red_social/paginas/Inicio/Index.dart';
 import 'package:red_social/paginas/Inicio/login.dart';
 
 class CrearCuenta extends StatefulWidget {
-  
   const CrearCuenta({super.key});
 
   @override
@@ -17,92 +16,147 @@ class _CrearCuentaState extends State<CrearCuenta> {
   TextEditingController tecCorreo = TextEditingController();
   TextEditingController tecPassw = TextEditingController();
   TextEditingController tecRePassw = TextEditingController();
-  final bool invert = true;
+  final bool invert = false; // Mantiene la estética oscura
 
+  // Método para validar el correo
+  bool validarCorreo(String correo) {
+    String patron =
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'; // Expresión regular
+    return RegExp(patron).hasMatch(correo);
+  }
 
+  // Método para validar la creación de la cuenta
+  void validarYCrearCuenta() {
+    String correo = tecCorreo.text.trim();
+    String passw = tecPassw.text;
+    String rePassw = tecRePassw.text;
+
+    if (correo.isEmpty || passw.isEmpty || rePassw.isEmpty) {
+      mostrarMensaje("Todos los campos son obligatorios.");
+      return;
+    }
+
+    if (!validarCorreo(correo)) {
+      mostrarMensaje("Formato de correo inválido, debe se '@gmail.com' por ejemplo");
+      return;
+    }
+
+    if (passw.length < 6) {
+      mostrarMensaje("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+
+    if (passw != rePassw) {
+      mostrarMensaje("Las contraseñas no coinciden.");
+      return;
+    }
+
+    // Si todo está correcto, navega al Login
+    mostrarMensaje("Cuenta creada exitosamente!", esExito: true);
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+      );
+    });
+  }
+
+  // Método para mostrar mensajes en un SnackBar
+  void mostrarMensaje(String mensaje, {bool esExito = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          mensaje,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: esExito ? Colors.green : Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // Envolvemos todo en un Scaffold
-      backgroundColor: Colors.black, // Establece el fondo negro
+    return Scaffold(
+      backgroundColor: Colors.black87,
+      appBar: AppBar(
+        title: const Text(
+          "Crear Cuenta",
+          style: TextStyle(color: Colors.black87),
+        ),
+        backgroundColor: const Color.fromARGB(167, 251, 251, 251),
+        elevation: 0,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Container(
-            height: 700,
-            width: 450,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 253, 147, 17),
-              borderRadius: BorderRadius.circular(20)
-            ),
-            child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.only(top: 0, left: 50, right: 50),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Título
-              const Padding(
-                padding: EdgeInsets.only(top: 20),
-                child: Center(
-                  child: Text(
-                    "Crear cuenta",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              const SizedBox(height: 20),
+              const Text(
+                "Crear Cuenta",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
-          
+              const SizedBox(height: 30),
+              InputText(
+                textEtiqueta: "Introduce el nombre",
+                textHint: "Introduce tu nombre..",
+                tecInput: tecNom,
+                invert: invert,
+              ),
               const SizedBox(height: 20),
-          
-              // Input Nombre
-              InputText( textEtiqueta: "Introduce el nombre", textHint: "Introduce tu nombre..", tecInput: tecNom, invert: invert,),
-          
-              //Input Correo
-              InputText(textEtiqueta: "Introduce el correo", textHint: "Introduce tu correo...", tecInput: tecCorreo, invert: invert ),
-          
-              //Input Contraseña
-              InputText(textEtiqueta: "Introduce la contraseña", textHint: "Introduce tu contraseña...", tecInput: tecPassw, invert: invert ),
-          
-              //Input Repetir Contraseña
-              InputText(textEtiqueta: "Repite la contraseña", textHint: "Repite tu contraseña...", tecInput: tecRePassw, invert: invert ),
-
-              Padding(
-                padding: const EdgeInsets.only(top: 30),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                
-                  //Boton para volver al Index (inicio)
+              InputText(
+                textEtiqueta: "Introduce el correo",
+                textHint: "Introduce tu correo...",
+                tecInput: tecCorreo,
+                invert: invert,
+              ),
+              const SizedBox(height: 20),
+              InputText(
+                textEtiqueta: "Introduce la contraseña",
+                textHint: "Introduce tu contraseña...",
+                tecInput: tecPassw,
+                invert: invert,
+                passwd: true,
+              ),
+              const SizedBox(height: 20),
+              InputText(
+                textEtiqueta: "Repite la contraseña",
+                textHint: "Repite tu contraseña...",
+                tecInput: tecRePassw,
+                invert: invert,
+                passwd: true,
+              ),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
                   Botones(
-                    textBoton: "Volver", 
-                    accionBoton:(){
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Index()), 
-                    );} 
+                    textBoton: "Crear Cuenta",
+                    accionBoton: validarYCrearCuenta, // Validación antes de crear
                   ),
-                
-                  //Boton para volver al Index (inicio)
+                  const SizedBox(height: 15),
                   Botones(
-                    textBoton: "Crear cuenta", 
-                    accionBoton:(){
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Login()), 
-                    );} 
+                    textBoton: "Volver",
+                    accionBoton: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Index()),
+                      );
+                    },
                   ),
-                
-                  ],
-                ),
-              )
-              //Botones
-              
-              
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
-          ),
-        ), 
+        ),
       ),
     );
   }

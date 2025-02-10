@@ -23,9 +23,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:red_social/paginas/Inicio/Crear_Cuenta.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:red_social/paginas/Inicio/Index.dart';
 
 
-void main() {
+void main() async{
+  await Hive.initFlutter();
+  await Hive.openBox("box_lista_reserva");
   runApp(const MainApp()); 
 }
 
@@ -35,7 +40,8 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: CrearCuenta()
+      debugShowCheckedModeBanner: false,
+      home: Index()
     );
   }
 }
