@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:red_social/paginas/Configuracion/bottom_nav.dart';
+import 'package:red_social/componentes/bottom_nav.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
