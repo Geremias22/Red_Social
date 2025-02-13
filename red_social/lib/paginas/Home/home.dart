@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:red_social/paginas/Home/CreatePage.dart';
+import 'package:red_social/paginas/Home/bandeja_entrada.dart';
+import 'package:red_social/paginas/Home/cam.dart';
 import 'search.dart';
 import 'profile.dart';
-import 'package:red_social/paginas/Configuracion/settings.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
