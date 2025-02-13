@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/paginas/Configuracion/settings.dart';
 import 'package:red_social/paginas/Home/home.dart';
 import 'package:red_social/paginas/Home/profile.dart';
 import 'package:red_social/paginas/Home/search.dart';
@@ -21,7 +22,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Profile()
+      home: Home()
     );
   }
 }

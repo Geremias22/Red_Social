@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/paginas/Configuracion/settings.dart';
+import 'package:red_social/paginas/Home/CreatePage.dart';
 import 'home.dart';
 import 'search.dart';
 
@@ -10,20 +12,33 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  int _selectedIndex = 3;
+  int _selectedIndex = 3; // Perfil está en la posición 3
 
   void _onItemTapped(int index) {
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Home()),
-      );
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Search()),
-      );
+    if (index == _selectedIndex) return; // Evita recargar la misma pantalla
+
+    Widget destination;
+    switch (index) {
+      case 0:
+        destination = const Home();
+        break;
+      case 1:
+        destination = const Search();
+        break;
+      case 2:
+        destination = const CreatePage(); // Nueva página para "+"
+        break;
+      case 3:
+        destination = const Profile();
+        break;
+      default:
+        return;
     }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
+    );
   }
 
   void _showBottomSheet(String title) {
@@ -76,7 +91,12 @@ class _ProfileState extends State<Profile> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Settings()),
+              );
+            },
           ),
         ],
       ),
