@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
+import 'profile.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -10,7 +11,8 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   List<String> searchHistory = [];
-  int _selectedIndex = 1;
+  int _selectedIndex = 1; // Índice de "Buscar"
+  final TextEditingController searchController = TextEditingController();
 
   void addToHistory(String search) {
     setState(() {
@@ -21,6 +23,7 @@ class _SearchState extends State<Search> {
         }
       }
     });
+    searchController.clear(); // Limpia el campo después de enviar
   }
 
   void clearHistory() {
@@ -30,18 +33,30 @@ class _SearchState extends State<Search> {
   }
 
   void _onItemTapped(int index) {
-    if (index == 0) { // Volver a Home
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Home()),
-      );
+    if (index == _selectedIndex) return; // Evita recargar la misma pantalla
+
+    Widget destination;
+    switch (index) {
+      case 0:
+        destination = const Home();
+        break;
+      case 1:
+        return; // Ya estamos en la pantalla de búsqueda
+      case 3:
+        destination = const Profile();
+        break;
+      default:
+        return;
     }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController searchController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -56,15 +71,13 @@ class _SearchState extends State<Search> {
             ),
             fillColor: Colors.grey[200],
             filled: true,
-            prefixIcon: Icon(Icons.search, color: Colors.grey),
+            prefixIcon: const Icon(Icons.search, color: Colors.grey),
             suffixIcon: IconButton(
-              icon: Icon(Icons.send, color: Colors.grey),
-              onPressed: () {
-                addToHistory(searchController.text);
-                searchController.clear();
-              },
+              icon: const Icon(Icons.send, color: Colors.grey),
+              onPressed: () => addToHistory(searchController.text),
             ),
           ),
+          onSubmitted: (value) => addToHistory(value), // Permite enviar con Enter
         ),
       ),
       body: Padding(
@@ -75,21 +88,21 @@ class _SearchState extends State<Search> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   "Historial de búsqueda",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
                   onPressed: clearHistory,
-                  child: Text("Borrar historial", style: TextStyle(color: Colors.red)),
+                  child: const Text("Borrar historial", style: TextStyle(color: Colors.red)),
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Column(
               children: searchHistory.map((search) {
                 return ListTile(
-                  leading: Icon(Icons.history, color: Colors.grey),
+                  leading: const Icon(Icons.history, color: Colors.grey),
                   title: Text(search),
                 );
               }).toList(),
@@ -104,7 +117,7 @@ class _SearchState extends State<Search> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""), // Botón "+", pero sin navegación
           BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
         ],
       ),

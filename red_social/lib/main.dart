@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/paginas/Configuracion/settings.dart';
 import 'package:red_social/paginas/Home/home.dart';
+import 'package:red_social/paginas/Home/profile.dart';
 import 'package:red_social/paginas/Home/search.dart';
 import 'package:red_social/paginas/Inicio/Crear_Cuenta.dart';
 import 'package:hive/hive.dart';
