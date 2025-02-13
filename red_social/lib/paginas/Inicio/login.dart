@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:red_social/componentes/botones.dart';
 import 'package:red_social/componentes/custom_appbar.dart';
 import 'package:red_social/componentes/input_text.dart';
+import 'package:red_social/paginas/Home/home.dart';
 import 'Index.dart';
 
 void main() {
@@ -55,7 +56,12 @@ class Login extends StatelessWidget {
             InputText(textEtiqueta: "Inserta la contraseña", tecInput: tecCorreo, textHint: "Escribe la contraseña...",),
 
             const SizedBox(height: 30),
-            Botones(textBoton: "Aceptar", accionBoton: (){})
+            Botones(textBoton: "Aceptar", accionBoton: (){
+              Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Home()),
+                      );
+            })
           ],
         ),
       ),

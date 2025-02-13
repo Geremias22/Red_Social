@@ -52,12 +52,22 @@ class _HomeState extends State<Home> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.camera_alt, color: Colors.red),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Cam()),
+            );
+          },
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.message, color: Colors.green),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BandejaEntrada()),
+              );
+            },
           ),
         ],
       ),
