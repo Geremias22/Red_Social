@@ -62,6 +62,7 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false, // Esto oculta la flecha de atrás
         title: const Text("Perfil", style: TextStyle(color: Colors.black)),
         actions: [
           IconButton(

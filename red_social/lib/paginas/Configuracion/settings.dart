@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:red_social/paginas/Home/home.dart';
 import 'package:red_social/paginas/Home/profile.dart';
 import 'package:red_social/paginas/Home/search.dart';
+import 'package:red_social/paginas/auth/Index.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class Settings extends StatefulWidget {
@@ -14,23 +16,16 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   int _selectedIndex = 3; // Index de perfil en BottomNavigationBar
 
-  void _onItemTapped(int index) {
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Home()),
-      );
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Search()),
-      );
-    } else if (index == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Profile()),
-      );
-    }
+// Método para cerrar sesión
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+
+    // Redirigir al usuario a la pantalla de login
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Index()),
+    );
   }
 
   @override
@@ -74,19 +69,20 @@ class _SettingsState extends State<Settings> {
             },
           ),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app, color: Colors.red),
+            title: const Text(
+              "Cerrar sesión",
+              style: TextStyle(color: Colors.red),
+            ),
+            onTap: () {
+              _logout();
+            },
+          ),
+          const Divider(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-        ],
-      ),
+      
     );
   }
 }

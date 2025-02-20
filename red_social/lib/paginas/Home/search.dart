@@ -39,6 +39,7 @@ class _SearchState extends State<Search> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
         title: TextField(
           controller: searchController,
           decoration: InputDecoration(

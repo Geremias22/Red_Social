@@ -30,9 +30,9 @@ class _BotonesState extends State<Botones> {
             boxShadow: [
               BoxShadow(
                 color: isHovering ? Colors.white54 : Colors.grey[600]!, // Sombra dinámica
-                blurRadius: isHovering ? 12 : 6,
-                spreadRadius: isHovering ? 3 : 1,
-                offset: const Offset(0, 4),
+                blurRadius: isHovering ? 4 : 5,
+                spreadRadius: isHovering ? 2 : 1,
+                offset: const Offset(0, 0),
               ),
             ],
           ),
