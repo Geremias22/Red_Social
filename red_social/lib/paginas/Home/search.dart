@@ -32,28 +32,6 @@ class _SearchState extends State<Search> {
     });
   }
 
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return; // Evita recargar la misma pantalla
-
-    Widget destination;
-    switch (index) {
-      case 0:
-        destination = const Home();
-        break;
-      case 1:
-        return; // Ya estamos en la pantalla de búsqueda
-      case 3:
-        destination = const Profile();
-        break;
-      default:
-        return;
-    }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => destination),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,17 +87,6 @@ class _SearchState extends State<Search> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""), // Botón "+", pero sin navegación
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-        ],
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:red_social/paginas/Inicio/Crear_Cuenta.dart';
-import 'package:red_social/paginas/Inicio/login.dart';
+import 'package:red_social/paginas/auth/Crear_Cuenta.dart';
+import 'package:red_social/paginas/auth/login.dart';
 
 void main() {
   runApp(const Index());

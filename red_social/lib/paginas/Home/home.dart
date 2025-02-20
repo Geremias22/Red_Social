@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/paginas/Home/Chat/bandeja_entrada.dart';
 import 'package:red_social/paginas/Home/CreatePage.dart';
-import 'package:red_social/paginas/Home/bandeja_entrada.dart';
 import 'package:red_social/paginas/Home/cam.dart';
 import 'search.dart';
 import 'profile.dart';
@@ -13,34 +13,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _selectedIndex = 0; // Índice de Home
 
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return; // Evita navegar a la misma pantalla
 
-    Widget destination;
-    switch (index) {
-      case 0:
-        destination = const Home();
-        break;
-      case 1:
-        destination = const Search();
-        break;
-      case 2:
-        destination = const CreatePage(); // Nueva página para "+"
-        break;
-      case 3:
-        destination = const Profile();
-        break;
-      default:
-        return;
-    }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => destination),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,17 +74,6 @@ class _HomeState extends State<Home> {
               ),
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
         ],
       ),
     );

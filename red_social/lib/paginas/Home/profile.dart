@@ -12,34 +12,9 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  int _selectedIndex = 3; // Perfil está en la posición 3
+  // Perfil está en la posición 3
 
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return; // Evita recargar la misma pantalla
 
-    Widget destination;
-    switch (index) {
-      case 0:
-        destination = const Home();
-        break;
-      case 1:
-        destination = const Search();
-        break;
-      case 2:
-        destination = const CreatePage(); // Nueva página para "+"
-        break;
-      case 3:
-        destination = const Profile();
-        break;
-      default:
-        return;
-    }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => destination),
-    );
-  }
 
   void _showBottomSheet(String title) {
     showModalBottomSheet(
@@ -171,17 +146,6 @@ class _ProfileState extends State<Profile> {
               },
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
         ],
       ),
     );

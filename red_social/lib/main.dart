@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:red_social/paginas/Configuracion/settings.dart';
-import 'package:red_social/paginas/Home/home.dart';
-import 'package:red_social/paginas/Home/profile.dart';
-import 'package:red_social/paginas/Home/search.dart';
-import 'package:red_social/paginas/Inicio/Crear_Cuenta.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:red_social/paginas/Inicio/Index.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:red_social/paginas/auth/Index.dart';
+import 'package:red_social/componentes/main_screen.dart';
 
-
-void main() async{
-  await Hive.initFlutter();
-  await Hive.openBox("box_lista_reserva");
-  runApp(const MainApp()); 
+void main() {
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  Future<bool> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false; // Devuelve true si hay sesión activa
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Home()
+      home: FutureBuilder<bool>(
+        future: _checkLoginStatus(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            if (snapshot.data == true) {
+              return const MainScreen(); // Si hay sesión, va a la pantalla principal
+            } else {
+              return const Index(); // Si no, muestra la pantalla de inicio (Index)
+            }
+          }
+        },
+      ),
     );
   }
 }
-

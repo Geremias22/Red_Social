@@ -8,8 +8,14 @@ class Add extends StatefulWidget {
 }
 
 class _AddState extends State<Add> {
-  @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Crear Publicación"),
+      ),
+      body: const Center(
+        child: Text("Pantalla para crear una nueva publicación."),
+      ),
+    );
   }
 }
