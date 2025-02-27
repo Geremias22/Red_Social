@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/paginas/Home/CreatePage.dart';
 import 'package:red_social/paginas/Home/add.dart';
 import 'package:red_social/paginas/Home/home.dart';
 import 'package:red_social/paginas/Home/profile.dart';
@@ -17,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const Home(),
     const Search(),
-    const Add(),
+    const CreatePage(),
     const Profile(),
   ];
 

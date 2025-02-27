@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:red_social/componentes/botones.dart';
 import 'package:red_social/paginas/auth/Crear_Cuenta.dart';
 import 'package:red_social/paginas/auth/login.dart';
 
@@ -29,46 +30,20 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: () {
+              Botones(textBoton: 'Crear cuenta', accionBoton: (){
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const CrearCuenta()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    context,
+                    MaterialPageRoute(builder: (context) => const CrearCuenta()),
+                  );
+                },
               ),
-              child: const Text(
-                'Crear cuenta',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
+            Botones(textBoton: 'Login', accionBoton: (){
+              Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const Login()),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-              ),
-              child: const Text(
-                'Login',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
             ),
           ],
         ),

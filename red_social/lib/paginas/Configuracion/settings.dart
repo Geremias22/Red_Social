@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:red_social/paginas/Home/home.dart';
-import 'package:red_social/paginas/Home/profile.dart';
-import 'package:red_social/paginas/Home/search.dart';
+import 'package:red_social/paginas/Configuracion/config_cuenta.dart';
+import 'package:red_social/paginas/Configuracion/config_privacidad.dart';
+import 'package:red_social/paginas/Configuracion/config_notificaciones.dart';
 import 'package:red_social/paginas/auth/Index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -14,9 +13,9 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  int _selectedIndex = 3; // Index de perfil en BottomNavigationBar
+  int _selectedIndex = 3; // Índice de perfil en BottomNavigationBar
 
-// Método para cerrar sesión
+  // Método para cerrar sesión
   Future<void> _logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
@@ -49,7 +48,10 @@ class _SettingsState extends State<Settings> {
             leading: const Icon(Icons.person, color: Colors.black),
             title: const Text("Configuración de cuenta"),
             onTap: () {
-              // Acción para Configuración de cuenta
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ConfigCuenta()),
+              );
             },
           ),
           const Divider(),
@@ -57,7 +59,10 @@ class _SettingsState extends State<Settings> {
             leading: const Icon(Icons.lock, color: Colors.black),
             title: const Text("Privacidad"),
             onTap: () {
-              // Acción para Privacidad
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ConfigPrivacidad()),
+              );
             },
           ),
           const Divider(),
@@ -65,7 +70,10 @@ class _SettingsState extends State<Settings> {
             leading: const Icon(Icons.notifications, color: Colors.black),
             title: const Text("Notificaciones"),
             onTap: () {
-              // Acción para Notificaciones
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ConfigNotificaciones()),
+              );
             },
           ),
           const Divider(),
@@ -82,7 +90,6 @@ class _SettingsState extends State<Settings> {
           const Divider(),
         ],
       ),
-      
     );
   }
 }
