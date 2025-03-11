@@ -4,6 +4,7 @@ import 'package:red_social/componentes/custom_appbar.dart';
 import 'package:red_social/componentes/input_text.dart';
 import 'package:red_social/paginas/auth/Index.dart';
 import 'package:red_social/paginas/auth/login.dart';
+import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
 
 class CrearCuenta extends StatefulWidget {
   const CrearCuenta({super.key});
@@ -26,20 +27,20 @@ class _CrearCuentaState extends State<CrearCuenta> {
     return RegExp(patron).hasMatch(correo);
   }
 
-  // Método para validar la creación de la cuenta
-  void validarYCrearCuenta() {
+  // Método para validar y registrar cuenta en Firebase
+  void validarYCrearCuenta() async {
+    String nombre = tecNom.text.trim();
     String correo = tecCorreo.text.trim();
     String passw = tecPassw.text;
     String rePassw = tecRePassw.text;
 
-    if (correo.isEmpty || passw.isEmpty || rePassw.isEmpty) {
+    if (nombre.isEmpty || correo.isEmpty || passw.isEmpty || rePassw.isEmpty) {
       mostrarMensaje("Todos los campos son obligatorios.");
       return;
     }
 
     if (!validarCorreo(correo)) {
-      mostrarMensaje(
-          "Formato de correo inválido, debe se '@gmail.com' por ejemplo");
+      mostrarMensaje("Formato de correo inválido, debe ser '@gmail.com' por ejemplo");
       return;
     }
 
@@ -53,14 +54,20 @@ class _CrearCuentaState extends State<CrearCuenta> {
       return;
     }
 
-    // Si todo está correcto, navega al Login
-    mostrarMensaje("Cuenta creada exitosamente!", esExito: true);
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Login()),
-      );
-    });
+    // Llamar al servicio de autenticación
+    String? resultado = await ServiciosAuth().registrarUsuario(correo, passw, nombre);
+
+    if (resultado == null) {
+      mostrarMensaje("Cuenta creada exitosamente!", esExito: true);
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Login()),
+        );
+      });
+    } else {
+      mostrarMensaje(resultado);
+    }
   }
 
   // Método para mostrar mensajes en un SnackBar
@@ -134,8 +141,7 @@ class _CrearCuentaState extends State<CrearCuenta> {
                 children: [
                   Botones(
                     textBoton: "Crear Cuenta",
-                    accionBoton:
-                        validarYCrearCuenta, // Validación antes de crear
+                    accionBoton: validarYCrearCuenta, // Llama al método de validación
                   ),
                   const SizedBox(height: 15),
                   Botones(

@@ -13,6 +13,9 @@ dependencies:
   hive_flutter: ^1.1.0
   image_picker: ^1.0.7
   shared_preferences: ^2.5.2
+  firebase_core: ^2.24.2  # Necesario para inicializar Firebase
+  cloud_firestore: ^4.15.5  # Base de datos Firestore
+  firebase_auth: ^4.15.5  # Autenticación con Firebase
 
 dev_dependencies:
   flutter_test:
