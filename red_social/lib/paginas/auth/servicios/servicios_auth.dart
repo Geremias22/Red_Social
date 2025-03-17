@@ -12,48 +12,55 @@ class ServiciosAuth {
 
   // Cerrar sesión
   Future<void> cerrarSesion() async {
-    return await _auth.signOut();
+    await _auth.signOut();
   }
 
   // Iniciar sesión con correo y contraseña
   Future<String?> iniciarSesion(String email, String password) async {
     try {
-      UserCredential credential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      return null;
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return null; // Si todo sale bien, devuelve null
     } on FirebaseAuthException catch (e) {
       return "Error: ${e.message}";
     }
   }
 
   // Registrar usuario con email y contraseña
-  Future<String?> registrarUsuario(String email, String password, String nombre) async {
-    try {
-      UserCredential credential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+ Future<String?> registrarUsuario(String email, String password, String nombre) async {
+  try {
+    print("🔥 Intentando crear usuario con Firebase Auth...");
+    UserCredential credencialUsuario = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    print("✅ Usuario creado con UID: ${credencialUsuario.user!.uid}");
 
-      // Guardar información adicional en Firestore
-      await _firestore.collection("Usuarios").doc(credential.user!.uid).set({
-        "uid": credential.user!.uid,
-        "nombre": nombre,
-        "email": email,
-        "sexo": null,
-        "fecha_nacimiento": null,
-        "img_perfil": null,
-        "region": null,
-        "ciudad": null,
-        "fecha_creacion": FieldValue.serverTimestamp(),
-        "fecha_modificacion": FieldValue.serverTimestamp(),
-      });
+    print("⏳ Guardando información del usuario en Firestore...");
+    
+    // Prueba con una escritura con await y captura errores
+    await _firestore.collection("Usuarios").doc(credencialUsuario.user!.uid).set({
+      "uid": credencialUsuario.user!.uid,
+      "nombre": nombre,
+      "email": email,
+      "fecha_creacion": FieldValue.serverTimestamp(),
+    }).then((_) {
+      print("✅ Usuario guardado en Firestore correctamente.");
+    }).catchError((error) {
+      print("❌ Error al guardar usuario en Firestore: $error");
+    });
 
-      return null;
-    } on FirebaseAuthException catch (e) {
-      return "Error: ${e.message}";
-    }
+    return null; // Si todo sale bien, devuelve null
+  } on FirebaseAuthException catch (e) {
+    print("❌ Error de FirebaseAuth: ${e.message}");
+    return "Error de FirebaseAuth: ${e.message}";
+  } on FirebaseException catch (e) {
+    print("🔥 Error de Firestore: ${e.message}");
+    return "Error de Firestore: ${e.message}";
+  } catch (e) {
+    print("⚠️ Error inesperado: $e");
+    return "Error inesperado: $e";
   }
+}
+
+
 }
