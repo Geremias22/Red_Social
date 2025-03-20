@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile.dart';
 
 class Search extends StatefulWidget {
@@ -10,28 +10,29 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  List<String> searchHistory = [];
-  int _selectedIndex = 1; // Índice de "Buscar"
+  List<Map<String, dynamic>> searchResults = [];
   final TextEditingController searchController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void addToHistory(String search) {
+  // Método para buscar usuarios en Firestore por nombre
+  void searchUsers(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        searchResults.clear();
+      });
+      return;
+    }
+
+    QuerySnapshot users = await _firestore
+        .collection("Usuarios")
+        .where("nombre", isGreaterThanOrEqualTo: query)
+        .where("nombre", isLessThan: query + 'z')
+        .get();
+
     setState(() {
-      if (!searchHistory.contains(search) && search.isNotEmpty) {
-        searchHistory.insert(0, search);
-        if (searchHistory.length > 5) {
-          searchHistory.removeLast();
-        }
-      }
-    });
-    searchController.clear(); // Limpia el campo después de enviar
-  }
-
-  void clearHistory() {
-    setState(() {
-      searchHistory.clear();
+      searchResults = users.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,7 @@ class _SearchState extends State<Search> {
         title: TextField(
           controller: searchController,
           decoration: InputDecoration(
-            hintText: "Search...",
+            hintText: "Buscar usuario...",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -52,43 +53,43 @@ class _SearchState extends State<Search> {
             filled: true,
             prefixIcon: const Icon(Icons.search, color: Colors.grey),
             suffixIcon: IconButton(
-              icon: const Icon(Icons.send, color: Colors.grey),
-              onPressed: () => addToHistory(searchController.text),
+              icon: const Icon(Icons.clear, color: Colors.grey),
+              onPressed: () {
+                searchController.clear();
+                setState(() {
+                  searchResults.clear();
+                });
+              },
             ),
           ),
-          onSubmitted: (value) => addToHistory(value), // Permite enviar con Enter
+          onChanged: searchUsers, // Llama al método al escribir
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Historial de búsqueda",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                TextButton(
-                  onPressed: clearHistory,
-                  child: const Text("Borrar historial", style: TextStyle(color: Colors.red)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              children: searchHistory.map((search) {
+      body: searchResults.isEmpty
+          ? Center(
+              child: Text("No se encontraron usuarios"),
+            )
+          : ListView.builder(
+              itemCount: searchResults.length,
+              itemBuilder: (context, index) {
+                final user = searchResults[index];
                 return ListTile(
-                  leading: const Icon(Icons.history, color: Colors.grey),
-                  title: Text(search),
+                  leading: CircleAvatar(
+                    child: Text(user['nombre'][0].toUpperCase()),
+                  ),
+                  title: Text(user['nombre']),
+                  subtitle: Text(user['email']),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Profile(),
+                      ),
+                    );
+                  },
                 );
-              }).toList(),
+              },
             ),
-          ],
-        ),
-      ),
     );
   }
 }

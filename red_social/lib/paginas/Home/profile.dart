@@ -1,20 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:red_social/paginas/Configuracion/settings.dart';
 import 'package:red_social/paginas/Home/CreatePage.dart';
+import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
+
 import 'home.dart';
 import 'search.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({super.key});
+  final String? userId;
+  
+
+  const Profile({super.key, this.userId});
 
   @override
   State<Profile> createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  // Perfil está en la posición 3
+  String? userId;
+  String? nomUsuari;
+  final ServiciosAuth _authService = ServiciosAuth();
 
+  @override
+  void initState() {
+    super.initState();
+    userId = widget.userId ?? _authService.getUsuarioActual(); // Si es null, obtén el actual
+    //nomUsuari = (widget.userId ?? ServiciosAuth().obtenerNombreUsuario()) as String?;
+    _cargarNombreUsuario();
+    print("🔹 userId en Profile: $userId"); // Verifica en consola
+  }
 
+  Future<void> _cargarNombreUsuario() async {
+    String? nombre = await ServiciosAuth().obtenerNombreUsuario();
+    if (nombre != null) {
+      setState(() {
+        nomUsuari = nombre;
+      });
+    } else {
+      setState(() {
+        nomUsuari = "No encontrado";
+      });
+    }
+  }
 
   void _showBottomSheet(String title) {
     showModalBottomSheet(
@@ -62,8 +89,11 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        automaticallyImplyLeading: false, // Esto oculta la flecha de atrás
-        title: const Text("Perfil", style: TextStyle(color: Colors.black)),
+        automaticallyImplyLeading: false,
+        title: Text(
+          "Perfil de ${userId ?? 'Desconocido'}",  // Si es null, muestra 'Desconocido'
+          style: const TextStyle(color: Colors.black),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
@@ -92,9 +122,9 @@ class _ProfileState extends State<Profile> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "UserName",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      Text(
+                        nomUsuari!,
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

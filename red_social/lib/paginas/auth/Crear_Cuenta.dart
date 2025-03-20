@@ -48,8 +48,8 @@ class _CrearCuentaState extends State<CrearCuenta> {
 
   // Método para validar y registrar cuenta en Firebase
   void validarYCrearCuenta() async {
-  print("🔄 Verificando conexión antes de crear usuario...");
-  verificarConexionFirestore();  // Llama a la función antes de registrar
+    print("🔄 Verificando conexión antes de crear usuario...");
+    verificarConexionFirestore();  // Llama a la función antes de registrar
 
     String nombre = tecNom.text.trim();
     String correo = tecCorreo.text.trim();
