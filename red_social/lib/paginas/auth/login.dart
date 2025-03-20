@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:red_social/paginas/Configuracion/settings.dart';
+import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:red_social/componentes/botones.dart';
 import 'package:red_social/componentes/custom_appbar.dart';
@@ -13,9 +14,11 @@ class Login extends StatelessWidget {
   const Login({super.key});
 
   // Método para manejar el inicio de sesión
-  Future<void> _login(BuildContext context) async {
+  Future<void> _login(BuildContext context, String email, String password) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', true);
+
+    ServiciosAuth().iniciarSesion(email, password);
 
     // Redirigir a la pantalla principal
     Navigator.pushReplacement(
@@ -73,7 +76,7 @@ class Login extends StatelessWidget {
             // Botón de login
             Botones(
               textBoton: "Aceptar",
-              accionBoton: () => _login(context), // Llama al método _login()
+              accionBoton: () => _login(context, tecCorreo.text, tecPassw.text), // Llama al método _login()
             )
           ],
         ),

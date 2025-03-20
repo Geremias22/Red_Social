@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:red_social/paginas/Home/search.dart';
 import 'firebase_options.dart';
 import 'paginas/auth/Index.dart';
 
