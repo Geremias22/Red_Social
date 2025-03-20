@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:red_social/paginas/Configuracion/settings.dart';
 import 'package:red_social/paginas/Home/CreatePage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
 import 'search.dart';
 
 class Profile extends StatefulWidget {
+  
   const Profile({super.key});
 
   @override
   State<Profile> createState() => _ProfileState();
+
+  
 }
 
 class _ProfileState extends State<Profile> {
+  final String nombreUsuario ;
   // Perfil está en la posición 3
+void initState() {
+  super.initState();
+  _cargarNombre();
+}
 
+Future<void> _cargarNombre() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  setState(() {
+    nombreUsuario = prefs.getString('nombreUsuario') ?? 'Usuario';
+  });
+}
 
 
   void _showBottomSheet(String title) {
@@ -93,7 +108,7 @@ class _ProfileState extends State<Profile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "UserName",
+                        nombreUsuario,
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Row(

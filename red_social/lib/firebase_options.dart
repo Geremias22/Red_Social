@@ -22,7 +22,7 @@ class DefaultFirebaseOptions {
       projectId: "bbdd-red-social",
       storageBucket: "bbdd-red-social.firebasestorage.app",
       messagingSenderId: "1050104026404",
-      appId: "1:1050104026404:web:5244f68122b8e8d3b54fb1"
+      appId: "1:1050104026404:web:5244f68122b8e8d3b54fb1",
     );
   }
 }
