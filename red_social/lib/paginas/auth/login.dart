@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:red_social/paginas/Configuracion/settings.dart';
 import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,17 +16,40 @@ class Login extends StatelessWidget {
 
   // Método para manejar el inicio de sesión
   Future<void> _login(BuildContext context, String email, String password) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
+  final authService = ServiciosAuth();
 
-    ServiciosAuth().iniciarSesion(email, password);
+  // Esperar a que termine el login
+  String? error = await authService.iniciarSesion(email, password);
 
-    // Redirigir a la pantalla principal
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MainScreen()),
+  if (error != null) {
+    // Mostrar error
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(error)),
+    );
+    return; // No continuar si falló
+  }
+
+  // Obtener el nombre del usuario
+  String? nombre = await authService.obtenerNombreUsuario();
+
+  // Mostrar mensaje si se obtuvo el nombre correctamente
+  if (nombre != null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("El usuario $nombre se ha logeado correctamente")),
     );
   }
+
+  // Guardar sesión local
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', true);
+
+  // Redirigir a la pantalla principal
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const MainScreen()),
+  );
+}
+
 
   
 

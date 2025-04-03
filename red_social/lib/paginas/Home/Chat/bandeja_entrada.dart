@@ -1,7 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:red_social/componentes/bottom_nav.dart';
 import 'package:red_social/paginas/Home/Chat/chat.dart';
-
 
 class BandejaEntrada extends StatefulWidget {
   const BandejaEntrada({super.key});
@@ -11,15 +11,7 @@ class BandejaEntrada extends StatefulWidget {
 }
 
 class _BandejaEntradaState extends State<BandejaEntrada> {
-  final List<String> usuarios = [
-    "Juan Pérez",
-    "Ana López",
-    "Carlos Ruiz",
-    "María Gómez",
-    "David Fernández",
-    "Laura Sánchez",
-    "Pedro Martínez"
-  ];
+  final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
 
   @override
   Widget build(BuildContext context) {
@@ -28,24 +20,47 @@ class _BandejaEntradaState extends State<BandejaEntrada> {
         title: const Text('Mensajes'),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: usuarios.length,
-        itemBuilder: (context, index) {
-          return _buildMessageItem(usuarios[index]);
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('Usuarios').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No hay usuarios disponibles'));
+          }
+
+          final usuarios = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: usuarios.length,
+            itemBuilder: (context, index) {
+              Map<String, dynamic> userData =
+                  usuarios[index].data() as Map<String, dynamic>;
+
+              // No mostrar el usuario actual en la lista
+              if (userData['email'] == currentUserEmail) {
+                return const SizedBox.shrink();
+              }
+
+              return _buildMessageItem(userData);
+            },
+          );
         },
       ),
-      
     );
   }
 
-  Widget _buildMessageItem(String userName) {
+  Widget _buildMessageItem(Map<String, dynamic> userData) {
     return InkWell(
       onTap: () {
-        // Navegar a la pantalla de chat
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Chat(userName: userName),
+            builder: (context) => Chat(
+              userName: userData['nombre'], // Ajusta según cómo guardes el nombre
+            ),
           ),
         );
       },
@@ -70,12 +85,12 @@ class _BandejaEntradaState extends State<BandejaEntrada> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    userName,
+                    userData['nombre'] ?? 'Sin nombre',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    'Último mensaje...',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    userData['email'] ?? 'Sin email',
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ],
               )
