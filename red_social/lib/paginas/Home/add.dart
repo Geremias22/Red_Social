@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker_web/image_picker_web.dart';
-import 'dart:typed_data';
-import 'dart:html' as html;
+import 'package:image_picker/image_picker.dart';
+import 'dart:io'; // para trabajar con imágenes locales
 
 class Add extends StatefulWidget {
   const Add({super.key});
@@ -11,14 +10,14 @@ class Add extends StatefulWidget {
 }
 
 class _AddState extends State<Add> {
-  Uint8List? _imageBytes;
-  String? _imageName;
+  File? _imageFile;
 
   Future<void> _pickImage() async {
-    final image = await ImagePickerWeb.getImageAsBytes();
-    if (image != null) {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        _imageBytes = image;
+        _imageFile = File(pickedFile.path);
       });
     }
   }
@@ -31,8 +30,8 @@ class _AddState extends State<Add> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _imageBytes != null
-                ? Image.memory(_imageBytes!, height: 200)
+            _imageFile != null
+                ? Image.file(_imageFile!, height: 200)
                 : const Text("No hay imagen seleccionada"),
             const SizedBox(height: 20),
             ElevatedButton(

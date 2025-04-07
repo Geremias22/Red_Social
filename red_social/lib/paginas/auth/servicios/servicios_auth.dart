@@ -64,7 +64,7 @@ class ServiciosAuth {
     }
   }
 
-  // ✅ Obtener nombre del usuario actual
+  // Obtener nombre del usuario actual
   Future<String?> obtenerNombreUsuario() async {
     try {
       String? uid = getUsuarioActualUID();
