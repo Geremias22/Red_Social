@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:red_social/componentes/Template_profile.dart';
 import 'profile.dart';
 
 class Search extends StatefulWidget {
@@ -83,7 +84,7 @@ class _SearchState extends State<Search> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Profile(),
+                        builder: (context) => TemplateProfile(userId: user['uid']),
                       ),
                     );
                   },

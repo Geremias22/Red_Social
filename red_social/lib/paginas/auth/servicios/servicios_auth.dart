@@ -5,83 +5,88 @@ class ServiciosAuth {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Obtener usuario actual
-  String? getUsuarioActual() {
-    User? usuario = _auth.currentUser;
-    if (usuario != null) {
-      print("🔹 Usuario autenticado: ${usuario.uid}");  // Verifica en consola si el UID se obtiene bien
-      return usuario.uid;  // Devuelve solo el UID del usuario
-    } else {
-      print("⚠️ No hay usuario autenticado.");
-      return null;
-    }
+  // ✅ Obtener usuario actual
+  String? getUsuarioActualUID() {
+    return _auth.currentUser?.uid;
   }
 
-  // Cerrar sesión
+  // ✅ Cerrar sesión
   Future<void> cerrarSesion() async {
     await _auth.signOut();
   }
 
-  // Iniciar sesión con correo y contraseña
-  Future<String?> iniciarSesion(String email, String password) async {
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      print("Login fet");
-      return null; // Si todo sale bien, devuelve null
-    } on FirebaseAuthException catch (e) {
-      return "Error: ${e.message}";
-    }
-  }
-
-  // Registrar usuario con email y contraseña
+  // ✅ Registro con control de errores y nombre
   Future<String?> registrarUsuario(String email, String password, String nombre) async {
     try {
-      print("🔥 Intentando crear usuario con Firebase Auth...");
-      UserCredential credencialUsuario = await _auth.createUserWithEmailAndPassword(
+      UserCredential cred = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print("✅ Usuario creado con UID: ${credencialUsuario.user!.uid}");
 
-      print("⏳ Guardando información del usuario en Firestore...");
-      
-      // Guardar datos del usuario en Firestore
-      await _firestore.collection("Usuarios").doc(credencialUsuario.user!.uid).set({
-        "uid": credencialUsuario.user!.uid,
-        "nombre": nombre,
-        "email": email,
-        "fecha_creacion": FieldValue.serverTimestamp(),
-      });
+      await _guardarDatosUsuario(cred.user!, email, nombre);
 
-      print("✅ Usuario guardado en Firestore correctamente.");
-      return null; // Si todo sale bien, devuelve null
+      return null;
     } on FirebaseAuthException catch (e) {
-      print("❌ Error de FirebaseAuth: ${e.message}");
-      return "Error de FirebaseAuth: ${e.message}";
-    } on FirebaseException catch (e) {
-      print("🔥 Error de Firestore: ${e.message}");
-      return "Error de Firestore: ${e.message}";
+      switch (e.code) {
+        case "email-already-in-use":
+          return "Este correo ya está registrado.";
+        case "invalid-email":
+          return "El formato del correo no es válido.";
+        case "weak-password":
+          return "La contraseña es demasiado débil.";
+        default:
+          return "Error: ${e.message}";
+      }
     } catch (e) {
-      print("⚠️ Error inesperado: $e");
       return "Error inesperado: $e";
     }
   }
 
+  // ✅ Login con validación de existencia en Firestore
+  Future<String?> iniciarSesion(String email, String password) async {
+    try {
+      UserCredential cred = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-Future<String?> obtenerNombreUsuario() async {
-  try {
-    DocumentSnapshot doc = 
-        await _firestore.collection("Usuarios").doc(getUsuarioActual()).get();
+      // Verifica que el usuario exista en Firestore
+      DocumentSnapshot doc = await _firestore.collection("Usuarios").doc(cred.user!.uid).get();
 
-    if (doc.exists) {
-      return doc.get("nombre"); // Devuelve el campo "nombre"
-    } else {
-      return null; // El documento no existe
+      if (!doc.exists) {
+        // Crear el documento si no existe
+        await _guardarDatosUsuario(cred.user!, email, ""); // Nombre vacío si no se tiene
+      }
+
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return "Error al iniciar sesión: ${e.message}";
     }
-  } catch (e) {
-    print("Error al obtener el nombre: $e");
-    return null;
   }
-}
 
+  // Obtener nombre del usuario actual
+  Future<String?> obtenerNombreUsuario() async {
+    try {
+      String? uid = getUsuarioActualUID();
+      if (uid == null) return null;
+
+      DocumentSnapshot doc = await _firestore.collection("Usuarios").doc(uid).get();
+      if (doc.exists) {
+        return doc.get("nombre") ?? "";
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 🔒 Método privado para guardar datos de usuario en Firestore
+  Future<void> _guardarDatosUsuario(User user, String email, String nombre) async {
+    await _firestore.collection("Usuarios").doc(user.uid).set({
+      "uid": user.uid,
+      "email": email,
+      "nombre": nombre,
+      "fecha_creacion": FieldValue.serverTimestamp(),
+    });
+  }
 }

@@ -1,87 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:red_social/componentes/bottom_nav.dart';
-import 'package:red_social/paginas/Home/Chat/chat.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:red_social/paginas/Home/Chat/chat.dart'; // Ajusta si el path es distinto
 
-
-class BandejaEntrada extends StatefulWidget {
+class BandejaEntrada extends StatelessWidget {
   const BandejaEntrada({super.key});
 
   @override
-  State<BandejaEntrada> createState() => _BandejaEntradaState();
-}
-
-class _BandejaEntradaState extends State<BandejaEntrada> {
-  final List<String> usuarios = [
-    "Juan Pérez",
-    "Ana López",
-    "Carlos Ruiz",
-    "María Gómez",
-    "David Fernández",
-    "Laura Sánchez",
-    "Pedro Martínez"
-  ];
-
-  @override
   Widget build(BuildContext context) {
+    final String? uidActual = FirebaseAuth.instance.currentUser?.uid;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mensajes'),
+        title: const Text("Mensajes"),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: usuarios.length,
-        itemBuilder: (context, index) {
-          return _buildMessageItem(usuarios[index]);
-        },
-      ),
-      
-    );
-  }
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection("Usuarios").snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return const Text("Error al cargar usuarios.");
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-  Widget _buildMessageItem(String userName) {
-    return InkWell(
-      onTap: () {
-        // Navegar a la pantalla de chat
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Chat(userName: userName),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        child: Container(
-          padding: const EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Colors.grey.shade300),
-            ),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.blue.shade200,
-                child: const Icon(Icons.person, color: Colors.white),
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    userName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    'Último mensaje...',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
+          final usuarios = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: usuarios.length,
+            itemBuilder: (context, index) {
+              final datosUsuario = usuarios[index].data() as Map<String, dynamic>;
+
+              // Ignorar usuario actual
+              if (datosUsuario["uid"] == uidActual) {
+                return const SizedBox.shrink();
+              }
+
+              final String nombreReceptor = datosUsuario["nombre"] ?? "Sin nombre";
+              final String idReceptor = datosUsuario["uid"];
+
+              return ListTile(
+                leading: const Icon(Icons.person),
+                title: Text(nombreReceptor),
+                subtitle: Text(datosUsuario["email"]),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Chat(
+                        idReceptor: idReceptor,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }
