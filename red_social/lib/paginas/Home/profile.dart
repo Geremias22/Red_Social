@@ -24,7 +24,7 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    userId = widget.userId ?? _authService.getUsuarioActual(); // Si es null, obtén el actual
+    userId = widget.userId ?? _authService.getUsuarioActualUID(); // Si es null, obtén el actual
     //nomUsuari = (widget.userId ?? ServiciosAuth().obtenerNombreUsuario()) as String?;
     _cargarNombreUsuario();
     print("🔹 userId en Profile: $userId"); // Verifica en consola
@@ -91,8 +91,8 @@ class _ProfileState extends State<Profile> {
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
-          "Perfil de ${userId ?? 'Desconocido'}",  // Si es null, muestra 'Desconocido'
-          style: const TextStyle(color: Colors.black),
+          "${nomUsuari ?? 'Desconocido'}",  // Si es null, muestra 'Desconocido'
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -122,24 +122,45 @@ class _ProfileState extends State<Profile> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        nomUsuari!,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
+                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          GestureDetector(
-                            onTap: () => _showBottomSheet("Publicaciones"),
-                            child: const Text("Publicaciones", style: TextStyle(color: Colors.blue)),
+                          Column(
+                            children: [
+                              Text(
+                                "0", 
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
+                              ),
+                              GestureDetector(
+                                onTap: () => _showBottomSheet("Publicaciones"),
+                                child: const Text("Publicaciones", style: TextStyle(color: Colors.blue)),
+                              ),
+                            ],
                           ),
-                          GestureDetector(
-                            onTap: () => _showBottomSheet("Seguidores"),
-                            child: const Text("Seguidores", style: TextStyle(color: Colors.blue)),
+                          Column(
+                            children: [
+                              Text(
+                                "0", 
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
+                              ),
+                              GestureDetector(
+                                onTap: () => _showBottomSheet("Seguidores"),
+                                child: const Text("Seguidores", style: TextStyle(color: Colors.blue)),
+                              ),
+                            ],
                           ),
-                          GestureDetector(
-                            onTap: () => _showBottomSheet("Seguidos"),
-                            child: const Text("Seguidos", style: TextStyle(color: Colors.blue)),
+                          Column(
+                            children: [
+                              Text(
+                                "0", 
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
+                              ),
+                              GestureDetector(
+                                onTap: () => _showBottomSheet("Seguidos"),
+                                child: const Text("Seguidos", style: TextStyle(color: Colors.blue)),
+                              ),
+                            ],
                           ),
                         ],
                       ),

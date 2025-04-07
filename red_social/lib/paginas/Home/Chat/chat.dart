@@ -1,76 +1,109 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:red_social/componentes/chatInput.dart';
+import 'package:red_social/paginas/auth/servicios/servicio_chat.dart';
+import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
+import 'package:red_social/componentes/burbujaMSG.dart';
 
 class Chat extends StatefulWidget {
-  final String userName;
-  const Chat({super.key, required this.userName});
+  final String idReceptor;
+  const Chat({super.key, required this.idReceptor});
 
   @override
   State<Chat> createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  final TextEditingController _messageController = TextEditingController();
-  final FocusNode _focusNode = FocusNode(); // Nodo de enfoque
-  final List<String> _messages = []; // Lista de mensajes
+  final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
 
-  void _sendMessage() {
-    if (_messageController.text.isNotEmpty) {
-      setState(() {
-        _messages.add(_messageController.text);
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode.addListener(() {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        hacerScrollAbajo();
       });
-      _messageController.clear();
+    });
 
-      // Mantener el input enfocado
+    Future.delayed(const Duration(milliseconds: 500), () {
+      hacerScrollAbajo();
+    });
+  }
+
+  void hacerScrollAbajo() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent + 100,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.fastOutSlowIn,
+      );
+    }
+  }
+
+  void enviarMensaje() {
+    if (_controller.text.trim().isNotEmpty) {
+      ServicioChat().enviarMensaje(widget.idReceptor, _controller.text.trim());
+      _controller.clear();
       FocusScope.of(context).requestFocus(_focusNode);
+      Future.delayed(const Duration(milliseconds: 50), () {
+        hacerScrollAbajo();
+      });
     }
   }
 
   @override
-  void dispose() {
-    _focusNode.dispose(); // Liberar memoria
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final idActual = ServiciosAuth().getUsuarioActualUID();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.userName),
-        backgroundColor: const Color.fromARGB(255, 169, 201, 255),
+        title: const Text("Chat"),
+        backgroundColor: Colors.blue[200],
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              reverse: true, // Muestra los mensajes nuevos en la parte inferior
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        _messages[index],
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
+            child: StreamBuilder(
+              stream: ServicioChat().getMensajes(idActual!, widget.idReceptor),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) return const Text("Error cargando mensajes.");
+                if (!snapshot.hasData) return const Text("Cargando...");
+
+                return ListView(
+                  controller: _scrollController,
+                  children: snapshot.data!.docs.map((doc) {
+                    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+                    return Burbujamsg(
+                      mensaje: data['mensaje'],
+                      idAutor: data['idAutor'],
+                      timestamp: TimeOfDay.fromDateTime(data['timestamp'].toDate()),
+                    );
+                  }).toList(),
                 );
               },
             ),
           ),
-          // Se usa el nuevo componente ChatInput
-          ChatInput(
-            controller: _messageController,
-            focusNode: _focusNode,
-            onSendMessage: _sendMessage,
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  onSubmitted: (_) => enviarMensaje(),
+                  decoration: const InputDecoration(
+                    hintText: "Escribe tu mensaje...",
+                    filled: true,
+                    fillColor: Color.fromARGB(255, 200, 235, 255),
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: enviarMensaje,
+                icon: const Icon(Icons.send),
+              ),
+            ],
           ),
         ],
       ),
