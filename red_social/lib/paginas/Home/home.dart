@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:red_social/componentes/ComentariosScreen.dart';
+import 'package:red_social/paginas/Home/Chat/bandeja_entrada.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -28,7 +29,14 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             icon: const Icon(Icons.send, color: Colors.white),
-            onPressed: () {},
+           onPressed: () {
+               Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BandejaEntrada()
+                    ),
+                  );
+            },
           ),
         ],
       ),
