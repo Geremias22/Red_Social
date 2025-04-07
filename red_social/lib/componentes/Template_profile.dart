@@ -1,44 +1,53 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:red_social/paginas/Configuracion/settings.dart';
-import 'package:red_social/paginas/Home/CreatePage.dart';
+import 'package:red_social/paginas/Configuracion/settings.dart' as miSettings;
 import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
 
-import 'home.dart';
-import 'search.dart';
-
-class Profile extends StatefulWidget {
+class TemplateProfile extends StatefulWidget {
   final String? userId;
-  
 
-  const Profile({super.key, this.userId});
+  const TemplateProfile({super.key, this.userId});
 
   @override
-  State<Profile> createState() => _ProfileState();
+  State<TemplateProfile> createState() => _TemplateProfileState();
 }
 
-class _ProfileState extends State<Profile> {
+class _TemplateProfileState extends State<TemplateProfile> {
   String? userId;
   String? nomUsuari;
+  bool cargando = true;
+
   final ServiciosAuth _authService = ServiciosAuth();
 
   @override
   void initState() {
     super.initState();
-    userId = widget.userId ?? _authService.getUsuarioActualUID(); // Si es null, obtén el actual
-    //nomUsuari = (widget.userId ?? ServiciosAuth().obtenerNombreUsuario()) as String?;
+    userId = widget.userId ?? _authService.getUsuarioActualUID();
     _cargarNombreUsuario();
-    print("🔹 userId en Profile: $userId"); // Verifica en consola
+    print("🔹 userId en TemplateProfile: $userId");
   }
 
   Future<void> _cargarNombreUsuario() async {
-    String? nombre = await ServiciosAuth().obtenerNombreUsuario();
-    if (nombre != null) {
+    if (userId == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance.collection("Usuarios").doc(userId).get();
+
+      if (doc.exists) {
+        setState(() {
+          nomUsuari = doc.get("nombre") ?? "Sin nombre";
+          cargando = false;
+        });
+      } else {
+        setState(() {
+          nomUsuari = "No encontrado";
+          cargando = false;
+        });
+      }
+    } catch (e) {
       setState(() {
-        nomUsuari = nombre;
-      });
-    } else {
-      setState(() {
-        nomUsuari = "No encontrado";
+        nomUsuari = "Error";
+        cargando = false;
       });
     }
   }
@@ -85,27 +94,39 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    if (cargando) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          "${nomUsuari ?? 'Desconocido'}",  // Si es null, muestra 'Desconocido'
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Settings()),
-              );
-            },
-          ),
-        ],
+      backgroundColor: Colors.white,
+      elevation: 0,
+      automaticallyImplyLeading: false, // Desactivamos el auto-leading
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {
+          Navigator.pop(context); // Vuelve atrás
+        },
       ),
+      title: Text(
+        "Perfil de ${nomUsuari ?? 'Desconocido'}",
+        style: const TextStyle(color: Colors.black),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.settings, color: Colors.black),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => miSettings.Settings()),
+            );
+          },
+        ),
+      ],
+    ),
       body: Column(
         children: [
           Padding(
@@ -122,45 +143,24 @@ class _ProfileState extends State<Profile> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      
+                      Text(
+                        nomUsuari ?? "Nombre no disponible",
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            children: [
-                              Text(
-                                "0", 
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
-                              ),
-                              GestureDetector(
-                                onTap: () => _showBottomSheet("Publicaciones"),
-                                child: const Text("Publicaciones", style: TextStyle(color: Colors.blue)),
-                              ),
-                            ],
+                          GestureDetector(
+                            onTap: () => _showBottomSheet("Publicaciones"),
+                            child: const Text("Publicaciones", style: TextStyle(color: Colors.blue)),
                           ),
-                          Column(
-                            children: [
-                              Text(
-                                "0", 
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
-                              ),
-                              GestureDetector(
-                                onTap: () => _showBottomSheet("Seguidores"),
-                                child: const Text("Seguidores", style: TextStyle(color: Colors.blue)),
-                              ),
-                            ],
+                          GestureDetector(
+                            onTap: () => _showBottomSheet("Seguidores"),
+                            child: const Text("Seguidores", style: TextStyle(color: Colors.blue)),
                           ),
-                          Column(
-                            children: [
-                              Text(
-                                "0", 
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
-                              ),
-                              GestureDetector(
-                                onTap: () => _showBottomSheet("Seguidos"),
-                                child: const Text("Seguidos", style: TextStyle(color: Colors.blue)),
-                              ),
-                            ],
+                          GestureDetector(
+                            onTap: () => _showBottomSheet("Seguidos"),
+                            child: const Text("Seguidos", style: TextStyle(color: Colors.blue)),
                           ),
                         ],
                       ),

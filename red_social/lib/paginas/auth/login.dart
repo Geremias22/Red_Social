@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:red_social/paginas/Configuracion/settings.dart';
+import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:red_social/componentes/botones.dart';
 import 'package:red_social/componentes/custom_appbar.dart';
@@ -6,20 +10,48 @@ import 'package:red_social/componentes/input_text.dart';
 import 'package:red_social/componentes/main_screen.dart'; // Ahora redirige a la pantalla principal
 import 'package:red_social/paginas/auth/Index.dart';
 
+
 class Login extends StatelessWidget {
   const Login({super.key});
 
   // Método para manejar el inicio de sesión
-  Future<void> _login(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
+  Future<void> _login(BuildContext context, String email, String password) async {
+  final authService = ServiciosAuth();
 
-    // Redirigir a la pantalla principal
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MainScreen()),
+  // Esperar a que termine el login
+  String? error = await authService.iniciarSesion(email, password);
+
+  if (error != null) {
+    // Mostrar error
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(error)),
+    );
+    return; // No continuar si falló
+  }
+
+  // Obtener el nombre del usuario
+  String? nombre = await authService.obtenerNombreUsuario();
+
+  // Mostrar mensaje si se obtuvo el nombre correctamente
+  if (nombre != null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("El usuario $nombre se ha logeado correctamente")),
     );
   }
+
+  // Guardar sesión local
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', true);
+
+  // Redirigir a la pantalla principal
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const MainScreen()),
+  );
+}
+
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +100,7 @@ class Login extends StatelessWidget {
             // Botón de login
             Botones(
               textBoton: "Aceptar",
-              accionBoton: () => _login(context), // Llama al método _login()
+              accionBoton: () => _login(context, tecCorreo.text, tecPassw.text), // Llama al método _login()
             )
           ],
         ),
