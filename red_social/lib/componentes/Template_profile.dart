@@ -121,7 +121,7 @@ class _TemplateProfileState extends State<TemplateProfile> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => miSettings.Settings()),
+              MaterialPageRoute(builder: (context) => const miSettings.Settings()),
             );
           },
         ),

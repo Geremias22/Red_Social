@@ -1,14 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:red_social/paginas/Configuracion/settings.dart';
 import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:red_social/componentes/botones.dart';
 import 'package:red_social/componentes/custom_appbar.dart';
 import 'package:red_social/componentes/input_text.dart';
 import 'package:red_social/componentes/main_screen.dart'; // Ahora redirige a la pantalla principal
-import 'package:red_social/paginas/auth/Index.dart';
 
 
 class Login extends StatelessWidget {
