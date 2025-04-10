@@ -27,7 +27,7 @@ class _SearchState extends State<Search> {
     QuerySnapshot users = await _firestore
         .collection("Usuarios")
         .where("nombre", isGreaterThanOrEqualTo: query)
-        .where("nombre", isLessThan: query + 'z')
+        .where("nombre", isLessThan: '${query}z')
         .get();
 
     setState(() {
@@ -67,7 +67,7 @@ class _SearchState extends State<Search> {
         ),
       ),
       body: searchResults.isEmpty
-          ? Center(
+          ? const Center(
               child: Text("No se encontraron usuarios"),
             )
           : ListView.builder(

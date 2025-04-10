@@ -33,7 +33,7 @@ class _HomeState extends State<Home> {
                Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BandejaEntrada()
+                      builder: (context) => const BandejaEntrada()
                     ),
                   );
             },

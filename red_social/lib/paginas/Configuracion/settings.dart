@@ -13,7 +13,7 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  int _selectedIndex = 3; // Índice de perfil en BottomNavigationBar
+  final int _selectedIndex = 3; // Índice de perfil en BottomNavigationBar
 
   // Método para cerrar sesión
   Future<void> _logout() async {

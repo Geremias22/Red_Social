@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:red_social/paginas/Home/CreatePage.dart';
-import 'package:red_social/paginas/Home/add.dart';
 import 'package:red_social/paginas/Home/home.dart';
 import 'package:red_social/paginas/Home/profile.dart';
 import 'package:red_social/paginas/Home/search.dart';

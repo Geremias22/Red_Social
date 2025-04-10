@@ -27,7 +27,7 @@ class InputText extends StatelessWidget {
             padding: const EdgeInsets.only(left: 10),
             child: Text(
               textEtiqueta,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
                 color: Colors.white,

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:red_social/paginas/auth/servicios/servicio_chat.dart';
 import 'package:red_social/paginas/auth/servicios/servicios_auth.dart';
