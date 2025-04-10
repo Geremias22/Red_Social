@@ -8,9 +8,15 @@ import 'paginas/auth/Index.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Asegura que Firebase esté bien configurado
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    if (e.code != 'duplicate-app') {
+      rethrow; // Solo relanza si no es el error de duplicado
+    }
+  }
 
   runApp(const MainApp());
 }
@@ -22,13 +28,11 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Oculta la barra de debug
-      title: 'Red Social', 
+      title: 'Red Social',
       theme: ThemeData(
         primarySwatch: Colors.blue, // Tema de la app
       ),
-      home: const PortalAuth(),
- // La pantalla inicial
+      home: const PortalAuth(), // La pantalla inicial
     );
   }
 }
-    

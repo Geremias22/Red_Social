@@ -91,7 +91,7 @@ class _ProfileState extends State<Profile> {
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
-          "${nomUsuari ?? 'Desconocido'}",  // Si es null, muestra 'Desconocido'
+          nomUsuari ?? 'Desconocido',  // Si es null, muestra 'Desconocido'
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -128,9 +128,9 @@ class _ProfileState extends State<Profile> {
                         children: [
                           Column(
                             children: [
-                              Text(
+                              const Text(
                                 "0", 
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
                               ),
                               GestureDetector(
                                 onTap: () => _showBottomSheet("Publicaciones"),
@@ -140,9 +140,9 @@ class _ProfileState extends State<Profile> {
                           ),
                           Column(
                             children: [
-                              Text(
+                              const Text(
                                 "0", 
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
                               ),
                               GestureDetector(
                                 onTap: () => _showBottomSheet("Seguidores"),
@@ -152,9 +152,9 @@ class _ProfileState extends State<Profile> {
                           ),
                           Column(
                             children: [
-                              Text(
+                              const Text(
                                 "0", 
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
                               ),
                               GestureDetector(
                                 onTap: () => _showBottomSheet("Seguidos"),
