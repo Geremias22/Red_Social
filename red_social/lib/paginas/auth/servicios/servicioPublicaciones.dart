@@ -1,16 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 class ServicioPublicaciones {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // 🔹 Obtener el UID del usuario actual
   String? getUsuarioActual() {
     return _auth.currentUser?.uid;
   }
 
-  // 🔥 Crear una publicación
+  // 🔥 Subir imagen a Firebase Storage
+  Future<String> subirImagen(File imagen) async {
+    String uid = getUsuarioActual()!;
+    String nombreArchivo = "${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("posts")
+        .child(uid)
+        .child(nombreArchivo);
+
+    UploadTask uploadTask = ref.putFile(imagen);
+    TaskSnapshot snapshot = await uploadTask;
+    return await snapshot.ref.getDownloadURL();
+  }
+
+  // 🔥 Crear una publicación con imagen y descripción
   Future<String?> crearPublicacion(String descripcion, String imagenUrl) async {
     try {
       String? uid = getUsuarioActual();
@@ -43,14 +60,13 @@ class ServicioPublicaciones {
     }
   }
 
-  // 📥 Obtener todas las publicaciones (ordenadas por fecha)
   Stream<QuerySnapshot> obtenerPublicaciones() {
-    return _firestore.collection("Publicaciones")
-      .orderBy("fecha", descending: true)
-      .snapshots();
+    return _firestore
+        .collection("Publicaciones")
+        .orderBy("fecha", descending: true)
+        .snapshots();
   }
 
-  // 👍 Dar like a una publicación
   Future<void> darLike(String postId, int likesActuales) async {
     try {
       await _firestore.collection("Publicaciones").doc(postId).update({
@@ -61,7 +77,6 @@ class ServicioPublicaciones {
     }
   }
 
-  // 💬 Agregar comentario a una publicación
   Future<void> agregarComentario(String postId, String comentario) async {
     try {
       String? uid = getUsuarioActual();
@@ -81,7 +96,6 @@ class ServicioPublicaciones {
         "fecha": FieldValue.serverTimestamp(),
       });
 
-      // Actualizar contador de comentarios
       await _firestore.collection("Publicaciones").doc(postId).update({
         "comentarios": FieldValue.increment(1),
       });
@@ -90,16 +104,15 @@ class ServicioPublicaciones {
     }
   }
 
-  // 📥 Obtener comentarios de una publicación
   Stream<QuerySnapshot> obtenerComentarios(String postId) {
-    return _firestore.collection("Publicaciones")
-      .doc(postId)
-      .collection("Comentarios")
-      .orderBy("fecha", descending: true)
-      .snapshots();
+    return _firestore
+        .collection("Publicaciones")
+        .doc(postId)
+        .collection("Comentarios")
+        .orderBy("fecha", descending: true)
+        .snapshots();
   }
 
-  // 🗑 Eliminar una publicación
   Future<void> eliminarPublicacion(String postId) async {
     try {
       await _firestore.collection("Publicaciones").doc(postId).delete();
@@ -107,26 +120,4 @@ class ServicioPublicaciones {
       print("❌ Error al eliminar publicación: $e");
     }
   }
-
-    void crearPublicacionDemo() {
-      FirebaseFirestore.instance.collection('Publicaciones').add({
-        "usuario": "lucas",
-        "uid": "DNIiP5vK0AecyNidYr3tuGlR3R82",
-        "email": "lucasquintana@ceroca.cat",
-        "verificado": false,
-        "imagenPerfil": "img/imgPerfil.jpg",
-        "imagenPost": "img/demoPost.jpg",
-        "descripcion": "Disfrutando un hermoso atardecer 🌅",
-        "likes": 120,
-        "comentarios": 30,
-        "compartidos": 50,
-        "fecha_creacion": FieldValue.serverTimestamp(),
-      }).then((_) {
-        print("✅ Publicación creada con éxito.");
-      }).catchError((error) {
-        print("❌ Error al crear publicación: $error");
-      });
-    }
-
-
 }

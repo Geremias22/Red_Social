@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:red_social/paginas/auth/servicios/servicioPublicaciones.dart';
+
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
 
@@ -10,14 +12,56 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  final List<File> _images = [];
+  File? _image;
+  final TextEditingController _descripcionController = TextEditingController();
+  final ServicioPublicaciones _servicioPublicaciones = ServicioPublicaciones();
+  bool _cargando = false;
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _images.add(File(pickedFile.path));
+        _image = File(pickedFile.path);
       });
+    }
+  }
+
+  Future<void> _publicar() async {
+    if (_image == null || _descripcionController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Selecciona una imagen y escribe una descripción")),
+      );
+      return;
+    }
+
+    setState(() => _cargando = true);
+
+    try {
+      String urlImagen = await _servicioPublicaciones.subirImagen(_image!);
+      String? error = await _servicioPublicaciones.crearPublicacion(
+        _descripcionController.text.trim(),
+        urlImagen,
+      );
+
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("❌ $error")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("✅ Publicación creada exitosamente")),
+        );
+        setState(() {
+          _image = null;
+          _descripcionController.clear();
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("❌ Error: $e")),
+      );
+    } finally {
+      setState(() => _cargando = false);
     }
   }
 
@@ -29,53 +73,51 @@ class _CreatePageState extends State<CreatePage> {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 5,
-                mainAxisSpacing: 5,
-              ),
-              itemCount: _images.length + 1,
-              itemBuilder: (context, index) {
-                if (index == _images.length) {
-                  return GestureDetector(
-                    onTap: _pickImage,
-                    child: Container(
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.add, size: 40, color: Colors.grey),
-                    ),
-                  );
-                }
-                return Image.file(_images[index], fit: BoxFit.cover);
-              },
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 10,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
           children: [
-            const SizedBox(width: 40), // Espacio para el FAB
-            ElevatedButton(
+            _image != null
+                ? Image.file(_image!, height: 250)
+                : Container(
+                    height: 250,
+                    color: Colors.grey[300],
+                    alignment: Alignment.center,
+                    child: const Text("No hay imagen seleccionada"),
+                  ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _descripcionController,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                labelText: "Descripción",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
               onPressed: _pickImage,
-              child: const Text("Galería"),
+              icon: const Icon(Icons.image),
+              label: const Text("Seleccionar Imagen"),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton.icon(
+              onPressed: _cargando ? null : _publicar,
+              icon: const Icon(Icons.upload),
+              label: _cargando
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text("Publicar"),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _pickImage,
-        backgroundColor: Colors.black,
-        child: const Icon(Icons.camera_alt, color: Colors.white),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
