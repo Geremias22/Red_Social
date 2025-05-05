@@ -33,26 +33,27 @@ class ServicioPublicaciones {
   /// Sube una imagen al sistema de archivos local (o a tu propio storage) y retorna el path
   /// Nota: ajusta esta parte para usar el storage deseado (e.g., AWS S3, servidor propio...)
   Future<String> subirImagen(File imagen) async {
-  final uid = getUsuarioActual();
-  if (uid == null) throw Exception('Usuario no autenticado');
+    final uid = getUsuarioActual();
+    if (uid == null) throw Exception('Usuario no autenticado');
 
-  // 1) Obtén el directorio permitido de tu app
-  final appDir = await getApplicationDocumentsDirectory();
-  // final appDir = await getTemporaryDirectory(); // si prefieres temp
+    // 1) Obtén el directorio permitido de tu app
+    final appDir = await getApplicationDocumentsDirectory();
+    // final appDir = await getTemporaryDirectory(); // si prefieres temp
 
-  // 2) Crea subcarpeta posts/uid
-  final uploadsDir = Directory(p.join(appDir.path, 'posts', uid));
-  if (!await uploadsDir.exists()) {
-    await uploadsDir.create(recursive: true);
+    // 2) Crea subcarpeta posts/uid
+    final uploadsDir = Directory(path.join(appDir.path, 'posts', uid));
+    if (!await uploadsDir.exists()) {
+      await uploadsDir.create(recursive: true);
+    }
+
+    // 3) Cópialo allí
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}${path.extension(imagen.path)}';
+    final destPath = path.join(uploadsDir.path, fileName);
+    await imagen.copy(destPath);
+
+    return destPath;
   }
 
-  // 3) Cópialo allí
-  final fileName = '${DateTime.now().millisecondsSinceEpoch}${p.extension(imagen.path)}';
-  final destPath = p.join(uploadsDir.path, fileName);
-  await imagen.copy(destPath);
-
-  return destPath;
-}
   /// Crea un documento de publicación en MongoDB
   Future<void> crearPublicacion({
     required String descripcion,
@@ -84,7 +85,7 @@ class ServicioPublicaciones {
       await connect();
     }
     final pipeline = [
-      { r'$sort': { 'fecha': -1 } }
+      {r'$sort': {'fecha': -1}}
     ];
     final aggStream = _postsCol.aggregateToStream(pipeline);
     await for (final doc in aggStream) {
