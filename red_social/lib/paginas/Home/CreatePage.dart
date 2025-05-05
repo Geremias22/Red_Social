@@ -37,28 +37,26 @@ class _CreatePageState extends State<CreatePage> {
     setState(() => _cargando = true);
 
     try {
-      String urlImagen = await _servicioPublicaciones.subirImagen(_image!);
-      String? error = await _servicioPublicaciones.crearPublicacion(
-        _descripcionController.text.trim(),
-        urlImagen,
+      // 1) Subir la imagen y obtener la ruta/path
+      final urlImagen = await _servicioPublicaciones.subirImagen(_image!);
+
+      // 2) Crear la publicación con argumentos nombrados
+      await _servicioPublicaciones.crearPublicacion(
+        descripcion: _descripcionController.text.trim(),
+        imagenPath: urlImagen,
       );
 
-      if (error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("❌ $error")),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✅ Publicación creada exitosamente")),
-        );
-        setState(() {
-          _image = null;
-          _descripcionController.clear();
-        });
-      }
+      // 3) Confirmación al usuario
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("✅ Publicación creada exitosamente")),
+      );
+      setState(() {
+        _image = null;
+        _descripcionController.clear();
+      });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ Error: $e")),
+        SnackBar(content: Text("❌ Error al crear publicación: $e")),
       );
     } finally {
       setState(() => _cargando = false);

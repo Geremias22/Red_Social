@@ -1,123 +1,125 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:mongo_dart/mongo_dart.dart' as mongodb;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path/path.dart' as path;
+import 'package:red_social/mongodb/db_conf.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ServicioPublicaciones {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // Instancia de autenticación Firebase
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String? getUsuarioActual() {
-    return _auth.currentUser?.uid;
+  // Base de datos Mongo
+  mongodb.Db? _db;
+  late mongodb.DbCollection _postsCol;
+
+  /// Conectar a MongoDB
+  Future<void> connect() async {
+    _db = await mongodb.Db.create(BDConf().connectionString);
+    await _db!.open();
+    _postsCol = _db!.collection('publicaciones');
   }
 
-  // 🔥 Subir imagen a Firebase Storage
+  /// Desconectar de MongoDB
+  Future<void> disconnect() async {
+    await _db?.close();
+  }
+
+  /// Devuelve el UID del usuario actual
+  String? getUsuarioActual() => _auth.currentUser?.uid;
+
+  /// Sube una imagen al sistema de archivos local (o a tu propio storage) y retorna el path
+  /// Nota: ajusta esta parte para usar el storage deseado (e.g., AWS S3, servidor propio...)
   Future<String> subirImagen(File imagen) async {
-    String uid = getUsuarioActual()!;
-    String nombreArchivo = "${DateTime.now().millisecondsSinceEpoch}.jpg";
+  final uid = getUsuarioActual();
+  if (uid == null) throw Exception('Usuario no autenticado');
 
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child("posts")
-        .child(uid)
-        .child(nombreArchivo);
+  // 1) Obtén el directorio permitido de tu app
+  final appDir = await getApplicationDocumentsDirectory();
+  // final appDir = await getTemporaryDirectory(); // si prefieres temp
 
-    UploadTask uploadTask = ref.putFile(imagen);
-    TaskSnapshot snapshot = await uploadTask;
-    return await snapshot.ref.getDownloadURL();
+  // 2) Crea subcarpeta posts/uid
+  final uploadsDir = Directory(p.join(appDir.path, 'posts', uid));
+  if (!await uploadsDir.exists()) {
+    await uploadsDir.create(recursive: true);
   }
 
-  // 🔥 Crear una publicación con imagen y descripción
-  Future<String?> crearPublicacion(String descripcion, String imagenUrl) async {
-    try {
-      String? uid = getUsuarioActual();
-      if (uid == null) return "No hay usuario autenticado";
+  // 3) Cópialo allí
+  final fileName = '${DateTime.now().millisecondsSinceEpoch}${p.extension(imagen.path)}';
+  final destPath = p.join(uploadsDir.path, fileName);
+  await imagen.copy(destPath);
 
-      DocumentSnapshot userDoc = await _firestore.collection("Usuarios").doc(uid).get();
-      if (!userDoc.exists) return "Usuario no encontrado";
+  return destPath;
+}
+  /// Crea un documento de publicación en MongoDB
+  Future<void> crearPublicacion({
+    required String descripcion,
+    required String imagenPath,
+  }) async {
+    final uid = getUsuarioActual();
+    if (uid == null) throw Exception('Usuario no autenticado');
 
-      String nombreUsuario = userDoc.get("nombre");
-      String imagenPerfil = userDoc.get("profilePic") ?? "";
-      bool verificado = userDoc.get("verificado") ?? false;
+    // Conectar si no conectado
+    if (_db == null || !_db!.isConnected) {
+      await connect();
+    }
 
-      await _firestore.collection("Publicaciones").add({
-        "usuario": nombreUsuario,
-        "uid": uid,
-        "verificado": verificado,
-        "imagenPerfil": imagenPerfil,
-        "imagenPost": imagenUrl,
-        "descripcion": descripcion,
-        "likes": 0,
-        "comentarios": 0,
-        "compartidos": 0,
-        "fecha": FieldValue.serverTimestamp(),
-      });
+    final post = {
+      'uid': uid,
+      'imagenPath': imagenPath,
+      'descripcion': descripcion,
+      'likes': 0,
+      'comentarios': 0,
+      'compartidos': 0,
+      'fecha': DateTime.now().toUtc(),
+    };
+    await _postsCol.insertOne(post);
+  }
 
-      return null;
-    } catch (e) {
-      print("❌ Error al crear publicación: $e");
-      return "Error al crear la publicación";
+  /// Obtiene un stream de publicaciones ordenadas por fecha descendente
+  Stream<List<Map<String, dynamic>>> obtenerPublicaciones() async* {
+    if (_db == null || !_db!.isConnected) {
+      await connect();
+    }
+    final pipeline = [
+      { r'$sort': { 'fecha': -1 } }
+    ];
+    final aggStream = _postsCol.aggregateToStream(pipeline);
+    await for (final doc in aggStream) {
+      yield [doc];
     }
   }
 
-  Stream<QuerySnapshot> obtenerPublicaciones() {
-    return _firestore
-        .collection("Publicaciones")
-        .orderBy("fecha", descending: true)
-        .snapshots();
-  }
-
-  Future<void> darLike(String postId, int likesActuales) async {
-    try {
-      await _firestore.collection("Publicaciones").doc(postId).update({
-        "likes": likesActuales + 1,
-      });
-    } catch (e) {
-      print("❌ Error al dar like: $e");
+  /// Incrementa likes
+  Future<void> darLike(String postId) async {
+    if (_db == null || !_db!.isConnected) {
+      await connect();
     }
+    await _postsCol.updateOne(
+      mongodb.where.id(mongodb.ObjectId.fromHexString(postId)),
+      mongodb.modify.inc('likes', 1),
+    );
   }
 
-  Future<void> agregarComentario(String postId, String comentario) async {
-    try {
-      String? uid = getUsuarioActual();
-      if (uid == null) return;
-
-      DocumentSnapshot userDoc = await _firestore.collection("Usuarios").doc(uid).get();
-      if (!userDoc.exists) return;
-
-      String nombreUsuario = userDoc.get("nombre");
-      String imagenPerfil = userDoc.get("profilePic") ?? "";
-
-      await _firestore.collection("Publicaciones").doc(postId).collection("Comentarios").add({
-        "usuario": nombreUsuario,
-        "uid": uid,
-        "comentario": comentario,
-        "imagenPerfil": imagenPerfil,
-        "fecha": FieldValue.serverTimestamp(),
-      });
-
-      await _firestore.collection("Publicaciones").doc(postId).update({
-        "comentarios": FieldValue.increment(1),
-      });
-    } catch (e) {
-      print("❌ Error al agregar comentario: $e");
-    }
-  }
-
-  Stream<QuerySnapshot> obtenerComentarios(String postId) {
-    return _firestore
-        .collection("Publicaciones")
-        .doc(postId)
-        .collection("Comentarios")
-        .orderBy("fecha", descending: true)
-        .snapshots();
-  }
-
+  /// Elimina publicación y opcionalmente su imagen
   Future<void> eliminarPublicacion(String postId) async {
-    try {
-      await _firestore.collection("Publicaciones").doc(postId).delete();
-    } catch (e) {
-      print("❌ Error al eliminar publicación: $e");
+    if (_db == null || !_db!.isConnected) {
+      await connect();
     }
+    final doc = await _postsCol.findOne(
+      mongodb.where.id(mongodb.ObjectId.fromHexString(postId)),
+    );
+    if (doc != null) {
+      final imagenPath = doc['imagenPath'] as String?;
+      if (imagenPath != null) {
+        final file = File(imagenPath);
+        if (await file.exists()) await file.delete();
+      }
+    }
+    await _postsCol.deleteOne(
+      mongodb.where.id(mongodb.ObjectId.fromHexString(postId)),
+    );
   }
 }

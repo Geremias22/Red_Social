@@ -18,6 +18,8 @@ dependencies:
   firebase_auth: ^4.17.0  # Última versión estable de autenticación
   mongo_dart: ^0.10.4
   firebase_storage: ^11.0.10
+  path_provider: ^2.0.11
+
 
 
 
